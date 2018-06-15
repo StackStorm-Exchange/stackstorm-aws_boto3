@@ -86,3 +86,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# PyCharm settings
+.idea
+
+# Editor saves
+*~
+*-

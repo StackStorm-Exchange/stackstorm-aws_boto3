@@ -1,9 +1,9 @@
 # AWS Integration Pack
 
-The StackStorm AWS_boto3 integration pack boto3 actions in stackstorm dynamically. It has following features.
+This pack uses boto3 actions in StackStorm dynamically. It has the following features:
 
 - Uses boto3 configurations. Find more information on boto3 configuration in [boto3 documentation](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration). 
-- Ability to run cross region actions
+- Ability to run cross region actions.
 - Ability to run cross account actions.
 
 ## Prerequisites
@@ -12,7 +12,7 @@ AWS and Stackstorm, up and running.
 
 ## Boto3 documentation
 
-Boto3 contains detailed documentation and examples on each service. Follow link to find out about available services http://boto3.readthedocs.io/en/latest/reference/services/index.html
+Boto3 contains detailed documentation and examples on each service. See more about available services here:  http://boto3.readthedocs.io/en/latest/reference/services/index.html
 
 ## Setup
 
@@ -32,8 +32,7 @@ Boto3 contains detailed documentation and examples on each service. Follow link 
 
 This pack currently has no configuration ([See issue #4](https://github.com/StackStorm-Exchange/stackstorm-aws_boto3/issues/4)).
 
-
-The simplest way to configure and test boto3 is to use awscli.
+The simplest way to configure and test boto3 is to use `awscli`.
 
 ```
 pip install awscli
@@ -47,11 +46,14 @@ Then go ahead and install aws pack. `aws_boto3.boto3action` is ready to use, wit
 st2 run aws.boto3action service="ec2" action_name="describe_vpcs" region="us-west-1"
 ```
 
-In addition, let’s assume these is a boto3 profile name `production`. Use `production` profile as follows. Boto3 documentation has more information on profiles. http://boto3.readthedocs.io/en/latest/guide/configuration.html#shared-credentials-file
+Let’s assume there is a boto3 profile name `production`. Use it like this:
 
 ```
 st2 run aws_boto3.boto3action service="ec2" action_name="describe_vpcs" region="us-west-1" env="AWS_PROFILE=production"
 ```
+
+See the Boto3 documentation for more [information on profiles](http://boto3.readthedocs.io/en/latest/guide/configuration.html#shared-credentials-file).
+
 
 ## Example workflow - Create VPC
 
@@ -176,15 +178,15 @@ aws.create_vpc:
           params: <% dict(RouteTableId => $.route_table_id, GatewayId => $.igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
 ```
 
-Use this workflow as follows,
+Run it:
 
 ```
 st2 run aws_boto3.create_vpc cidr_block="172.18.0.0/16" region="us-west-2" availability_zone="us-west-2b" subnet_cidr_block="172.18.0.0/24"
 ```
 
-# Create VPC workflow with assume_role
+## Create VPC workflow with assume_role
 
-  Let’s assume we have two aws accounts. First aws account, 123456, is already configured to use boto3. Second aws account, 456789, has a `IAM` role `st2_role`. We can assume this role, then use `create_vpc` workflow to create vpc in aws account 456789.
+Let’s assume we have two aws accounts. First aws account, 123456, is already configured to use boto3. Second aws account, 456789, has a `IAM` role `st2_role`. We can assume this role, then use `create_vpc` workflow to create vpc in aws account 456789.
 
 action/workflows/create_vpc.yaml
 

@@ -27,5 +27,5 @@ class AssumeRoleTestCase(BaseActionTestCase):
     action_cls = Boto3AssumeRoleRunner
 
     def test_run_is_instance(self):
-        action = self.get_action_instance(self.full_config)
+        action = self.get_action_instance()
         self.assertIsInstance(action, self.action_cls)

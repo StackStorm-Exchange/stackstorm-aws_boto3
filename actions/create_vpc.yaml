@@ -1,0 +1,25 @@
+---
+name: "create_vpc"
+pack: aws_boto3
+runner_type: "mistral-v2"
+description: "Create VPC with boto3action"
+enabled: true
+entry_point: "workflows/create_vpc.yaml"
+parameters:
+  cidr_block:
+    type: "string"
+    description: "VPC CIDR block"
+    required: true
+  region:
+    type: "string"
+    description: "Region to create VPC"
+    required: true
+  subnet_cidr_block:
+    type: "string"
+    description: "Subnet CIDR block"
+    required: true
+  availability_zone:
+    type: "string"
+    description: "Availability zone to create subnet"
+    required: true
+...

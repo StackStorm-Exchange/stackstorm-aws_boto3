@@ -1,0 +1,105 @@
+---
+version: '2.0'
+aws_boto3.create_vpc_assume_role:
+    type: direct
+    description: "Create VPC with boto3action"
+    input:
+        - cidr_block
+        - region
+        - subnet_cidr_block
+        - availability_zone
+        - role_arn
+    tasks:
+      assume_role:
+        action: aws_boto3.assume_role
+        input:
+          role_arn: <% $.role_arn %>
+        publish:
+          credentials: <% task(assume_role).result.result %>
+        on-success:
+          - create_vpc
+
+      create_vpc:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: create_vpc
+          region: <% $.region %>
+          params: <% dict(CidrBlock => $.cidr_block, InstanceTenancy => "default") %>
+          credentials: <% $.credentials %>
+        publish:
+          vpc_id: <% task(create_vpc).result.result.Vpc.VpcId %>
+        on-success:
+          - create_subnet
+          - create_igw
+
+      create_subnet:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: create_subnet
+          region: <% $.region %>
+          params: <% dict(AvailabilityZone => $.availability_zone, CidrBlock => $.subnet_cidr_block, VpcId => $.vpc_id) %>
+          credentials: <% $.credentials %>
+        publish:
+          subnet_id: <% task(create_subnet).result.result.Subnet.SubnetId %>
+        on-success:
+          - create_route_table
+
+      create_igw:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: create_internet_gateway
+          region: <% $.region %>
+          credentials: <% $.credentials %>
+        publish:
+          igw_id: <% task(create_igw).result.result.InternetGateway.InternetGatewayId %>
+        on-success:
+          - attach_igw
+
+      attach_igw:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: attach_internet_gateway
+          region: <% $.region %>
+          params: <% dict(VpcId => $.vpc_id, InternetGatewayId => $.igw_id) %>
+          credentials: <% $.credentials %>
+        on-success:
+          - create_route_igw
+
+      create_route_table:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: create_route_table
+          region: <% $.region %>
+          params: <% dict(VpcId => $.vpc_id) %>
+          credentials: <% $.credentials %>
+        publish:
+          route_table_id: <% task(create_route_table).result.result.RouteTable.RouteTableId %>
+        on-success:
+          - attach_route_tables
+
+      attach_route_tables:
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: associate_route_table
+          region: <% $.region %>
+          params: <% dict(SubnetId => $.subnet_id, RouteTableId => $.route_table_id) %>
+          credentials: <% $.credentials %>
+        on-success:
+          - create_route_igw
+
+      create_route_igw:
+        join: 2
+        action: aws_boto3.boto3action
+        input:
+          service: ec2
+          action_name: create_route
+          region: <% $.region %>
+          params: <% dict(RouteTableId => $.route_table_id, GatewayId => $.igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
+          credentials: <% $.credentials %>
+...

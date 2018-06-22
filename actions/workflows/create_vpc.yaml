@@ -78,7 +78,7 @@ aws_boto3.create_vpc:
           - create_route_igw
 
       create_route_igw:
-        join: 2
+        join: all
         action: aws_boto3.boto3action
         input:
           service: ec2

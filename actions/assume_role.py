@@ -18,7 +18,7 @@ class Boto3AssumeRoleRunner(Action):
         success = False
         result = dict()
 
-        sts_kwargs=dict()
+        sts_kwargs = dict()
 
         if aws_access_key_id and aws_secret_access_key:
             sts_kwargs['aws_access_key_id'] = aws_access_key_id

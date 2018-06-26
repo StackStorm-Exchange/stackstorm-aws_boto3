@@ -2,7 +2,8 @@
 
 This pack uses boto3 actions in StackStorm dynamically. It has the following features:
 
-- Uses boto3 configurations. Find more information on boto3 configuration in [boto3 documentation](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration). 
+- Uses boto3 configurations. Find more information on boto3 configuration in
+  [boto3 documentation](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration). 
 - Ability to run cross region actions.
 - Ability to run cross account actions.
 
@@ -12,7 +13,8 @@ AWS and Stackstorm, up and running.
 
 ## Boto3 documentation
 
-Boto3 contains detailed documentation and examples on each service. See more about available services here:  http://boto3.readthedocs.io/en/latest/reference/services/index.html
+Boto3 contains detailed documentation and examples on each service. See more about available services 
+here: http://boto3.readthedocs.io/en/latest/reference/services/index.html
 
 ## Setup
 
@@ -37,10 +39,13 @@ The simplest way to configure and test boto3 is to use `awscli`.
 ```
 pip install awscli
 aws configure
-aws ec2 describe-vpcs --region "us-west-1"
+aws ec2 describe-vpcs --region "eu-west-1"
 ```
 
-Then go ahead and install aws pack. `aws_boto3.boto3action` is ready to use, without additional configurations.
+Or you can pass `aws_access_key_id` and `aws_secret_access_key` in as parameters to `assume_role` along with optional 
+MFA parameters.
+
+Then go ahead and install aws pack and then `aws_boto3.boto3action` is ready to use, without additional configurations.
 
 ```
 st2 run aws.boto3action service="ec2" action_name="describe_vpcs" region="us-west-1"
@@ -57,241 +62,40 @@ See the Boto3 documentation for more [information on profiles](http://boto3.read
 
 ## Example workflow - Create VPC
 
-action/create_vpc.yaml
+### aws_boto3.create_vpc
 
-```yaml
-name: "create_vpc"
-runner_type: "mistral-v2"
-description: "Create VPC with boto3action"
-enabled: true
-entry_point: "workflows/create_vpc.yaml"
-parameters:
-  cidr_block:
-    type: "string"
-    description: "VPC CIDR block"
-    required: true
-  region:
-    type: "string"
-    description: "Region to create VPC"
-    required: true
-  subnet_cidr_block:
-    type: "string"
-    description: "Subnet CIDR block"
-    required: true
-  availability_zone:
-    type: "string"
-    description: "Availability zone to create subnet"
-    required: true
+Create an VPC and a single subnet, run the following command:
 
 ```
-
-action/workflows/create_vpc.yaml
-
-
-```yaml
----
-version: '2.0'
-aws.create_vpc:
-    type: direct
-    description: "Create VPC with boto3action"
-    input:
-        - cidr_block
-        - region
-        - subnet_cidr_block
-        - availability_zone
-    tasks:
-      create_vpc:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_vpc
-          region: <% $.region %>
-          params: <% dict(CidrBlock => $.cidr_block, InstanceTenancy => "default") %>
-        publish:
-          vpc_id: <% task(create_vpc).result.result.Vpc.VpcId %>
-        on-success:
-          - create_subnet
-          - create_igw
-          
-      create_subnet:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_subnet
-          region: <% $.region %>
-          params: <% dict(AvailabilityZone => $.availability_zone, CidrBlock => $.subnet_cidr_block, VpcId => $.vpc_id) %>
-        publish:
-          subnet_id: <% task(create_subnet).result.result.Subnet.SubnetId %>
-        on-success:
-          - create_route_table
-
-      create_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_internet_gateway
-          region: <% $.region %>
-        publish:
-          igw_id: <% task(create_igw).result.result.InternetGateway.InternetGatewayId %>
-        on-success:
-          - attach_igw
-
-      attach_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: attach_internet_gateway
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id, InternetGatewayId => $.igw_id) %>
-        on-success:
-          - create_route_igw
-
-      create_route_table:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route_table
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id) %>
-        publish:
-          route_table_id: <% task(create_route_table).result.result.RouteTable.RouteTableId %>
-        on-success:
-          - attach_route_tables
-
-      attach_route_tables:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: associate_route_table
-          region: <% $.region %>
-          params: <% dict(SubnetId => $.subnet_id, RouteTableId => $.route_table_id) %>
-        on-success:
-          - create_route_igw
-
-      create_route_igw:
-        join: 2
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route
-          region: <% $.region %>
-          params: <% dict(RouteTableId => $.route_table_id, GatewayId => $.igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
-```
-
-Run it:
-
-```
-st2 run aws_boto3.create_vpc cidr_block="172.18.0.0/16" region="us-west-2" availability_zone="us-west-2b" subnet_cidr_block="172.18.0.0/24"
+st2 run aws_boto3.create_vpc \
+  cidr_block="172.18.0.0/16" \
+  region="eu-west-1" \
+  availability_zone="us-west-2b" \
+  subnet_cidr_block="172.18.0.0/24"
 ```
 
 ## Create VPC workflow with assume_role
 
-Let’s assume we have two aws accounts. First aws account, 123456, is already configured to use boto3. Second aws account, 456789, has a `IAM` role `st2_role`. We can assume this role, then use `create_vpc` workflow to create vpc in aws account 456789.
+Let’s assume we have two aws accounts. First aws account (`123456`) is already configured to use boto3. The second aws 
+account (`456789`) has a `IAM` role `st2_role` assigned to the ST2 instance. We can assume this role, then 
+use `create_vpc` workflow to create vpc in aws account 456789.
 
-action/workflows/create_vpc.yaml
+```
+st2 run aws_boto3.create_vpc \
+  role_arn="arn:aws:iam:456789:role/st2_role" \
+  cidr_block="172.18.0.0/16" \
+  region="eu-west-1" \
+  availability_zone="eu-west-1a" \
+  subnet_cidr_block="172.18.0.0/24"
+```
 
-```yaml
----
-version: '2.0'
-aws_boto3.create_vpc:
-    type: direct
-    description: "Create VPC with boto3action"
-    input:
-        - cidr_block
-        - region
-        - subnet_cidr_block
-        - availability_zone
-    tasks:
-      assume_role:
-        action: aws_boto3.assume_role
-        input:
-          role_arn: “arn:aws:iam:456789:role/st2_role”
-        publish:
-          credentials: <% task(assume_role).result.result %>
-        on-success:
-          - create_vpc
+If you have your own IAM account (`oliver`) in `123456` and are allowed to switch roles to `st2_role` within 
+account `456789` (plus and have exported variables for `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) you 
+could run the following command to create a VPC:
 
-      create_vpc:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_vpc
-          region: <% $.region %>
-          params: <% dict(CidrBlock => $.cidr_block, InstanceTenancy => "default") %>
-          credentials: <% $.credentials %>
-        publish:
-          vpc_id: <% task(create_vpc).result.result.Vpc.VpcId %>
-        on-success:
-          - create_subnet
-          - create_igw
-          
-      create_subnet:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_subnet
-          region: <% $.region %>
-          params: <% dict(AvailabilityZone => $.availability_zone, CidrBlock => $.subnet_cidr_block, VpcId => $.vpc_id) %>
-          credentials: <% $.credentials %>
-        publish:
-          subnet_id: <% task(create_subnet).result.result.Subnet.SubnetId %>
-        on-success:
-          - create_route_table
-
-      create_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_internet_gateway
-          region: <% $.region %>
-          credentials: <% $.credentials %>
-        publish:
-          igw_id: <% task(create_igw).result.result.InternetGateway.InternetGatewayId %>
-        on-success:
-          - attach_igw
-
-      attach_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: attach_internet_gateway
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id, InternetGatewayId => $.igw_id) %>
-          credentials: <% $.credentials %>
-        on-success:
-          - create_route_igw
-
-      create_route_table:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route_table
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id) %>
-          credentials: <% $.credentials %>
-        publish:
-          route_table_id: <% task(create_route_table).result.result.RouteTable.RouteTableId %>
-        on-success:
-          - attach_route_tables
-
-      attach_route_tables:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: associate_route_table
-          region: <% $.region %>
-          params: <% dict(SubnetId => $.subnet_id, RouteTableId => $.route_table_id) %>
-          credentials: <% $.credentials %>
-        on-success:
-          - create_route_igw
-
-      create_route_igw:
-        join: 2
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route
-          region: <% $.region %>
-          params: <% dict(RouteTableId => $.route_table_id, GatewayId => $.igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
-          credentials: <% $.credentials %>
+```
+st2 run aws_boto3.create_vpc_assume_role role_arn="arn:aws:iam::456789:role/st2_role" \
+  region="eu-west-1" cidr_block="172.18.0.0/16" availability_zone="eu-west-1a" subnet_cidr_block="172.18.0.0/24" \
+  aws_access_key_id="${AWS_ACCESS_KEY_ID}" aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}" \
+  serial_number="arn:aws:iam::123456:mfa/oliver" use_mfa=True token_code=123456
 ```

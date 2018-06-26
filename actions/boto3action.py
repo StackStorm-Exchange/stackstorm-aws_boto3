@@ -21,7 +21,7 @@ class Boto3ActionRunner(Action):
             client = boto3.client(service, region_name=region)
 
         if client is None:
-            return (False, 'boto3 client creation failed')
+            return False, 'boto3 client creation failed'
 
         if params is not None:
             response = getattr(client, action_name)(**params)
@@ -29,4 +29,4 @@ class Boto3ActionRunner(Action):
             response = getattr(client, action_name)()
 
         response = json.loads(json.dumps(response, default=json_serial))
-        return (True, response)
+        return True, response

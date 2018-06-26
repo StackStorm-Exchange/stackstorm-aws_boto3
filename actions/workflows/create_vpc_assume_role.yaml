@@ -9,11 +9,22 @@ aws_boto3.create_vpc_assume_role:
         - subnet_cidr_block
         - availability_zone
         - role_arn
+        - aws_access_key_id
+        - aws_secret_access_key
+        - use_mfa
+        - serial_number
+        - token_code
     tasks:
       assume_role:
         action: aws_boto3.assume_role
         input:
           role_arn: <% $.role_arn %>
+          aws_access_key_id: <% $.aws_access_key_id %>
+          aws_secret_access_key: <% $.aws_secret_access_key %>
+          use_mfa: <% $.use_mfa %>
+          serial_number: <% $.serial_number %>
+          token_code: <% $.token_code %>
+
         publish:
           credentials: <% task(assume_role).result.result %>
         on-success:

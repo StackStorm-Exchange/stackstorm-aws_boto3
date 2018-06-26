@@ -6,10 +6,6 @@ description: "Create VPC with boto3action using assume_role"
 enabled: true
 entry_point: "workflows/create_vpc_assume_role.yaml"
 parameters:
-  role_arn:
-    type: "string"
-    description: "ARN of the role to assume"
-    required: true
   cidr_block:
     type: "string"
     description: "VPC CIDR block"
@@ -26,4 +22,26 @@ parameters:
     type: "string"
     description: "Availability zone to create subnet"
     required: true
+  role_arn:
+    type: "string"
+    description: "ARN of the role"
+    required: true
+  aws_access_key_id:
+    type: "string"
+    description: "AWS Access Key"
+    secret: true
+  aws_secret_access_key:
+    type: "string"
+    description: "AWS Secret Access Key"
+    secret: true
+  use_mfa:
+    type: "boolean"
+    description: "Include MFA details."
+    default: False
+  serial_number:
+    type: "string"
+    description: "Serial number of the MFA"
+  token_code:
+    type: "string"
+    description: "Token code from the MFA"
 ...

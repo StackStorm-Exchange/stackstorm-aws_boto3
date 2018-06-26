@@ -49,7 +49,7 @@ class Boto3AssumeRoleRunner(Action):
             response = client.assume_role(**kwargs)
         except ClientError as e:
             result['error'] = e.message
-        else
+        else:
             response = json.loads(json.dumps(response, default=json_serial))
             result['AssumedRoleUser'] = response['AssumedRoleUser']
             result['Credentials'] = response['Credentials']

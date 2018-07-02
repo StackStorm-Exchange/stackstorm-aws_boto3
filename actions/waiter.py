@@ -9,7 +9,7 @@ class WaiterRunner(Action):
     def run(self, service, region, waiter_name, credentials, params, max_attempts=20):
         success = False
         client = None
-        result = None
+        result = dict()
         service_waiter = None
 
         if 'WaiterConfig' not in params:

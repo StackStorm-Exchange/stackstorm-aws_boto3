@@ -21,6 +21,7 @@ parameters:
   credentials:
     type: "object"
     description: "Response from assume role"
+    secret: true
   params:
     type: object
     description: "Parameters for the action"

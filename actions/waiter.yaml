@@ -1,0 +1,32 @@
+---
+name: "waiter"
+runner_type: "python-script"
+description: "Run any boto3 waiter"
+enabled: true
+entry_point: "waiter.py"
+pack: "aws_boto3"
+parameters:
+  service:
+    type: "string"
+    description: "Name of the service to create client"
+    required: true
+  region:
+    type: "string"
+    description: "Region where action is performed"
+    required: true
+  waiter_name:
+    type: "string"
+    description: "Name of the action to run"
+    required: true
+  credentials:
+    type: "object"
+    description: "Response from assume role"
+    secret: true
+  params:
+    type: object
+    description: "Parameters for the action"
+    required: true
+  max_attempts:
+    type: integer
+    description: "Number of wait attempts (default "
+    default: 20

@@ -3,7 +3,7 @@ name: "create_vpc"
 pack: aws_boto3
 runner_type: "mistral-v2"
 description: "Create VPC with boto3action"
-enabled: true
+enabled: false
 entry_point: "workflows/create_vpc.yaml"
 parameters:
   cidr_block:

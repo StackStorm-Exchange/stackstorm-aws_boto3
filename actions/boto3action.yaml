@@ -21,8 +21,21 @@ parameters:
   credentials:
     type: "object"
     description: "Response from assume role"
-    secret: true
+    properties:
+      AccessKeyId:
+        type: string
+        secret: true
+      Expiration:
+        type: string
+      SecretAccessKey:
+        type: string
+        secret: true
+      SessionToken:
+        type: string
+        secret: true
+      Credentials:
+        type: "object"
+        secret: true
   params:
     type: object
     description: "Parameters for the action"
-

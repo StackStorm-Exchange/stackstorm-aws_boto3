@@ -38,3 +38,4 @@ parameters:
   token_code:
     type: "string"
     description: "Token code from the MFA"
+    secret: true

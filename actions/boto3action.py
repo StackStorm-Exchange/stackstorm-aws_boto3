@@ -8,6 +8,7 @@ from lib.util import json_serial
 # pylint: disable=too-few-public-methods
 class Boto3ActionRunner(Action):
     def run(self, service, region, action_name, credentials, params):
+        session_kwargs = {}
 
         if credentials is not None:
 

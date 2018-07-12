@@ -5,7 +5,7 @@
 - Mark `token_code` on `assume_role` as a secret.
 - Fix example `create_vpn_assume_role` workflow to correctly publish `credentials` 
   and `assumed_role_user` details.
-- Add `properties` to `credentials` on `boto3action`.
+- Add `properties` to `credentials` on `boto3action` and `waiter`.
 
 ## v0.4.0
 - Add missing CHANGES file.

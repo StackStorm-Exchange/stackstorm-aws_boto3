@@ -26,7 +26,9 @@ aws_boto3.create_vpc_assume_role:
           token_code: <% $.token_code %>
 
         publish:
-          credentials: <% task(assume_role).result.result %>
+          credentials: <% task().result.result['Credentials'] %>
+          assumed_role_user: <% task().result.result['AssumedRoleUser'] %>
+
         on-success:
           - create_vpc
 
@@ -39,7 +41,7 @@ aws_boto3.create_vpc_assume_role:
           params: <% dict(CidrBlock => $.cidr_block, InstanceTenancy => "default") %>
           credentials: <% $.credentials %>
         publish:
-          vpc_id: <% task(create_vpc).result.result.Vpc.VpcId %>
+          vpc_id: <% task().result.result.Vpc.VpcId %>
         on-success:
           - create_subnet
           - create_igw
@@ -53,7 +55,7 @@ aws_boto3.create_vpc_assume_role:
           params: <% dict(AvailabilityZone => $.availability_zone, CidrBlock => $.subnet_cidr_block, VpcId => $.vpc_id) %>
           credentials: <% $.credentials %>
         publish:
-          subnet_id: <% task(create_subnet).result.result.Subnet.SubnetId %>
+          subnet_id: <% task().result.result.Subnet.SubnetId %>
         on-success:
           - create_route_table
 
@@ -65,7 +67,7 @@ aws_boto3.create_vpc_assume_role:
           region: <% $.region %>
           credentials: <% $.credentials %>
         publish:
-          igw_id: <% task(create_igw).result.result.InternetGateway.InternetGatewayId %>
+          igw_id: <% task().result.result.InternetGateway.InternetGatewayId %>
         on-success:
           - attach_igw
 
@@ -89,7 +91,7 @@ aws_boto3.create_vpc_assume_role:
           params: <% dict(VpcId => $.vpc_id) %>
           credentials: <% $.credentials %>
         publish:
-          route_table_id: <% task(create_route_table).result.result.RouteTable.RouteTableId %>
+          route_table_id: <% task().result.result.RouteTable.RouteTableId %>
         on-success:
           - attach_route_tables
 

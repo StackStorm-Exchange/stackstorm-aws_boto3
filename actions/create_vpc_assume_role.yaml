@@ -3,7 +3,7 @@ name: "create_vpc_assume_role"
 pack: aws_boto3
 runner_type: "mistral-v2"
 description: "Create VPC with boto3action using assume_role"
-enabled: true
+enabled: false
 entry_point: "workflows/create_vpc_assume_role.yaml"
 parameters:
   cidr_block:

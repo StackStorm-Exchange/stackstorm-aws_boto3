@@ -12,7 +12,6 @@ class WaiterRunner(Action):
         service_waiter = None
         session_kwargs = {}
 
-
         if 'WaiterConfig' not in params:
             # We should wait no more than 300 seconds
             params['WaiterConfig'] = {'MaxAttempts': max_attempts}

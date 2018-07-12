@@ -11,7 +11,6 @@ class Boto3ActionRunner(Action):
         session_kwargs = {}
 
         if credentials is not None:
-
             # This is backwards compatibility for a bug from the boto3 branch
             # of the aws pack.
             if 'Credentials' in credentials:

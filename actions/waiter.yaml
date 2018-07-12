@@ -1,9 +1,9 @@
 ---
-name: "boto3action"
+name: "waiter"
 runner_type: "python-script"
-description: "Run any boto3 action"
+description: "Run any boto3 waiter"
 enabled: true
-entry_point: "boto3action.py"
+entry_point: "waiter.py"
 pack: "aws_boto3"
 parameters:
   service:
@@ -14,7 +14,7 @@ parameters:
     type: "string"
     description: "Region where action is performed"
     required: true
-  action_name:
+  waiter_name:
     type: "string"
     description: "Name of the action to run"
     required: true
@@ -25,4 +25,8 @@ parameters:
   params:
     type: object
     description: "Parameters for the action"
-
+    required: true
+  max_attempts:
+    type: integer
+    description: "Number of wait attempts (default "
+    default: 20

@@ -1,0 +1,7 @@
+---
+region:
+  description: "API region to use (Not used)."
+  type: "string"
+  required: true
+  default: "us-east-1"
+...

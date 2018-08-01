@@ -1,0 +1,38 @@
+---
+name: "create_instance"
+pack: "aws_boto3"
+runner_type: "action-chain"
+description: "Create EC2 instance and assign tags"
+enabled: true
+entry_point: "workflows/create_instance.yaml"
+parameters:
+  region:
+    type: "string"
+    description: "Region to create EC2 instance in"
+    default: "us-east-1"
+  ImageId:
+    type: "string"
+    description: "AWS image ID to create instance from"
+    required: true
+  InstanceType:
+    type: "string"
+    description: "Flavor to use for instance creation"
+    default: "t2.nano"
+  SecurityGroupIds:
+    type: "array"
+    description: "AWS Security Group IDs"
+    default: []
+  SubnetId:
+    type: "string"
+    description: "AWS Subnet ID"
+    required: false
+  KeyName:
+    type: "string"
+    description: "SSH key to use during intial instance creation"
+    required: false
+  Tags:
+    type: "array"
+    items:
+      type: "object"
+    description: "A list of AWS tag objects in form of [{'Key1': 'Value1'}, {'Key2': 'Value2'}, ...]"
+    default: ["Creator": "StackStorm aws_boto3.create_instance workflow"]

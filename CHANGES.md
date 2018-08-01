@@ -1,5 +1,8 @@
 ## Change Log
 
+## v0.7.0
+- Add `create_instance` workflow.
+
 ## v0.6.0
 - Disable both the example workflows.
 - Mark `token_code` on `assume_role` as a secret.

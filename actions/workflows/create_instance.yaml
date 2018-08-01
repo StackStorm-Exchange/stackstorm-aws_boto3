@@ -1,0 +1,60 @@
+---
+# Render param objects as miltiline YAML string for later serialization
+# with skipping unnecessary keys.
+vars:
+  params: |-
+      MinCount: 1
+      MaxCount: 1
+      ImageId: "{{ImageId}}"
+      InstanceType: "{{InstanceType}}"
+      # Handle SecurityGroupIds as valid array
+      SecurityGroupIds: {{SecurityGroupIds|to_json_string}}
+      {% if SubnetId %}
+      SubnetId: "{{SubnetId}}"
+      {% endif %}
+      {% if KeyName %}
+      KeyName: "{{KeyName}}"
+      {% endif %}
+
+  # Transoform ``Tags`` array for Boto3 call
+  tags: |-
+      {% for i in Tags %}
+      - Key: "{{ i.keys()|first }}"
+        Value: "{{ i.values()|first }}"
+      {% endfor %}
+
+chain:
+  -
+    name: "run_instance"
+    ref: "aws_boto3.boto3action"
+    params:
+      service: "ec2"
+      action_name: "run_instances"
+      region: "{{region}}"
+      params: "{{params|from_yaml_string}}"
+    on-success: "wait_for_instance"
+  -
+    name: "wait_for_instance"
+    ref: "aws_boto3.waiter"
+    params:
+      service: "ec2"
+      waiter_name: "instance_running"
+      region: "{{region}}"
+      params:
+        InstanceIds:
+          - "{{run_instance.result.Instances[0].InstanceId}}"
+    on-success: "add_tags"
+  -
+    name: "add_tags"
+    ref: "aws_boto3.boto3action"
+    params:
+      service: "ec2"
+      action_name: "create_tags"
+      region: "{{region}}"
+      params: >-
+          {{
+            {
+              'Resources': [run_instance.result.Instances[0].InstanceId],
+              'Tags': tags|from_yaml_string
+            }
+          }}

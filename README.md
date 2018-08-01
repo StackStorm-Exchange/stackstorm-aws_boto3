@@ -60,6 +60,30 @@ st2 run aws_boto3.boto3action service="ec2" action_name="describe_vpcs" region="
 See the Boto3 documentation for more [information on profiles](http://boto3.readthedocs.io/en/latest/guide/configuration.html#shared-credentials-file).
 
 
+## Example workflow - Create instance
+
+### aws_boto3.create_instance
+
+Create an EC2 instance with defined keypair, subnet and security group:
+
+```
+st2 run aws_boto3.create_instance \
+  region=us-east-1 \
+  ImageId=ami-1234abcd \
+  KeyName=deployment-key \
+  SubnetId=subnet-5678efef \
+  SecurityGroupIds='["sg-dcba9100"]'
+```
+
+Create an instance and assign tags:
+
+```
+st2 run --auto-dict aws_boto3.create_instance \
+  ImageId=ami-1234abcd \
+  Tags=Name:my-instance \
+  Tags=Owner:me@example.com
+```
+
 ## Example workflow - Create VPC
 
 ### aws_boto3.create_vpc

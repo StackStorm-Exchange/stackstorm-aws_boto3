@@ -20,8 +20,9 @@ keywords:
   - SQS
   - lambda
 
-version : 0.6.0
+version : 0.7.0
 author : StackStorm, Inc.
 email : info@stackstorm.com
 contributors:
   - Jon Middleton <jjm@geeky-and-blonde.me.uk>
+  - Denys Havrysh <denys.gavrysh@gmail.com>

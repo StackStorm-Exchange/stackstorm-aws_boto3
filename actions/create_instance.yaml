@@ -35,4 +35,5 @@ parameters:
     items:
       type: "object"
     description: "A list of AWS tag objects in form of [{'Key1': 'Value1'}, {'Key2': 'Value2'}, ...]"
-    default: ["Creator": "StackStorm aws_boto3.create_instance workflow"]
+    default:
+      - Creator: "StackStorm aws_boto3.create_instance workflow"

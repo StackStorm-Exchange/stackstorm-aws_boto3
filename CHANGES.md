@@ -1,5 +1,8 @@
 ## Change Log
 
+## v0.7.1
+- Fix default tags parameter in `create_instance` workflow.
+
 ## v0.7.0
 - Add `create_instance` workflow.
 

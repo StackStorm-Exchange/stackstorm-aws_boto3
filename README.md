@@ -3,7 +3,7 @@
 This pack uses boto3 actions in StackStorm dynamically. It has the following features:
 
 - Uses boto3 configurations. Find more information on boto3 configuration in
-  [boto3 documentation](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration). 
+  [boto3 documentation](http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration).
 - Ability to run cross region actions.
 - Ability to run cross account actions.
 
@@ -13,7 +13,7 @@ AWS and Stackstorm, up and running.
 
 ## Boto3 documentation
 
-Boto3 contains detailed documentation and examples on each service. See more about available services 
+Boto3 contains detailed documentation and examples on each service. See more about available services
 here: http://boto3.readthedocs.io/en/latest/reference/services/index.html
 
 ## Setup
@@ -42,7 +42,7 @@ aws configure
 aws ec2 describe-vpcs --region "eu-west-1"
 ```
 
-Or you can pass `aws_access_key_id` and `aws_secret_access_key` in as parameters to `assume_role` along with optional 
+Or you can pass `aws_access_key_id` and `aws_secret_access_key` in as parameters to `assume_role` along with optional
 MFA parameters.
 
 Then go ahead and install aws pack and then `aws_boto3.boto3action` is ready to use, without additional configurations.
@@ -58,6 +58,14 @@ st2 run aws_boto3.boto3action service="ec2" action_name="describe_vpcs" region="
 ```
 
 See the Boto3 documentation for more [information on profiles](http://boto3.readthedocs.io/en/latest/guide/configuration.html#shared-credentials-file).
+
+## Example workflow - Scale up autoscaling group (using parameters)
+
+### aws_boto3.boto3action
+
+```
+st2 run aws_boto3.boto3action service="autoscaling" region="us-east-1" action_name="set_desired_capacity" params='{"AutoScalingGroupName": "my_asg","DesiredCapacity": 2}'
+```
 
 
 ## Example workflow - Create instance
@@ -100,8 +108,8 @@ st2 run aws_boto3.create_vpc \
 
 ## Create VPC workflow with assume_role
 
-Let’s assume we have two aws accounts. First aws account (`123456`) is already configured to use boto3. The second aws 
-account (`456789`) has a `IAM` role `st2_role` assigned to the ST2 instance. We can assume this role, then 
+Let’s assume we have two aws accounts. First aws account (`123456`) is already configured to use boto3. The second aws
+account (`456789`) has a `IAM` role `st2_role` assigned to the ST2 instance. We can assume this role, then
 use `create_vpc` workflow to create vpc in aws account 456789.
 
 ```
@@ -113,8 +121,8 @@ st2 run aws_boto3.create_vpc \
   subnet_cidr_block="172.18.0.0/24"
 ```
 
-If you have your own IAM account (`oliver`) in `123456` and are allowed to switch roles to `st2_role` within 
-account `456789` (plus and have exported variables for `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) you 
+If you have your own IAM account (`oliver`) in `123456` and are allowed to switch roles to `st2_role` within
+account `456789` (plus and have exported variables for `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) you
 could run the following command to create a VPC:
 
 ```

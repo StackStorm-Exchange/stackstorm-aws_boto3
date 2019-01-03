@@ -1,5 +1,8 @@
 ## Change Log
 
+## v0.7.2
+- Version bump to fix tagging issue. No code changes.
+
 ## v0.7.1
 - Fix default tags parameter in `create_instance` workflow.
 

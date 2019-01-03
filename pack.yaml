@@ -1,7 +1,7 @@
 ---
 ref: aws_boto3
 name : aws_boto3
-description : st2 content pack containing Amazon Web Services integrations using boto3.
+description : AWS actions using boto3
 keywords:
   - aws
   - amazon web services
@@ -20,7 +20,7 @@ keywords:
   - SQS
   - lambda
 
-version : 0.7.0
+version : 0.7.2
 author : StackStorm, Inc.
 email : info@stackstorm.com
 contributors:

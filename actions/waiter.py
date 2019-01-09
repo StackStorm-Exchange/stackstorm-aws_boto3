@@ -34,7 +34,7 @@ class WaiterRunner(Action):
 
         try:
             service_waiter = client.get_waiter(waiter_name)
-        except ValueError, e:
+        except ValueError as e:
             result['error'] = e.message
 
         try:

@@ -7,14 +7,16 @@ vars:
       MaxCount: 1
       ImageId: "{{ImageId}}"
       InstanceType: "{{InstanceType}}"
-      # Handle SecurityGroupIds as valid array
-      SecurityGroupIds: {{SecurityGroupIds|to_json_string}}
       {% if SubnetId %}
       SubnetId: "{{SubnetId}}"
       {% endif %}
       {% if KeyName %}
       KeyName: "{{KeyName}}"
       {% endif %}
+      # Handle following params as valid arrays/objects
+      SecurityGroupIds: {{SecurityGroupIds|to_json_string}}
+      BlockDeviceMappings: {{BlockDeviceMappings|to_json_string}}
+      IamInstanceProfile: {{IamInstanceProfile|to_json_string}}
 
   # Transoform ``Tags`` array for Boto3 call
   tags: |-

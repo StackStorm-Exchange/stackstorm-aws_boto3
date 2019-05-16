@@ -1,5 +1,9 @@
 ## Change Log
 
+## v0.7.3
+- Add support for `BlockDeviceMappings` and `IamInstanceProfile` parameters for
+  `create_instance` workflow.
+
 ## v0.7.2
 - Version bump to fix tagging issue. No code changes.
 
@@ -12,7 +16,7 @@
 ## v0.6.0
 - Disable both the example workflows.
 - Mark `token_code` on `assume_role` as a secret.
-- Fix example `create_vpn_assume_role` workflow to correctly publish `credentials` 
+- Fix example `create_vpn_assume_role` workflow to correctly publish `credentials`
   and `assumed_role_user` details.
 - Add `properties` to `credentials` on `boto3action` and `waiter`.
 

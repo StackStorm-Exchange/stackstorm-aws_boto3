@@ -30,6 +30,16 @@ parameters:
     type: "string"
     description: "SSH key to use during intial instance creation"
     required: false
+  BlockDeviceMappings:
+    type: "array"
+    items:
+      type: "object"
+    description: "The block device mapping entries"
+    default: []
+  IamInstanceProfile:
+    type: "object"
+    description: "The IAM instance profile"
+    default: {}
   Tags:
     type: "array"
     items:

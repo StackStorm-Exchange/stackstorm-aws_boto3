@@ -35,12 +35,12 @@ class WaiterRunner(Action):
         try:
             service_waiter = client.get_waiter(waiter_name)
         except ValueError as e:
-            result['error'] = e.message
+            result['error'] = str(e)
 
         try:
             service_waiter.wait(**params)
-        except WaiterError, e:
-            result['error'] = e.message
+        except WaiterError as e:
+            result['error'] = str(e)
         else:
             success = True
 

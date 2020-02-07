@@ -1,5 +1,10 @@
 ## Change Log
 
+## v0.7.4
+
+- Fixups for Python 3 compatibility
+- Add explicit support for Python 2 and 3
+
 ## v0.7.3
 - Add support for `BlockDeviceMappings` and `IamInstanceProfile` parameters for
   `create_instance` workflow.

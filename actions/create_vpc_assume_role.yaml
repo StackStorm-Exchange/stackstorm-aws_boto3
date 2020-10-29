@@ -1,47 +1,46 @@
 ---
-name: "create_vpc_assume_role"
+name: create_vpc_assume_role
 pack: aws_boto3
-runner_type: "mistral-v2"
-description: "Create VPC with boto3action using assume_role"
+runner_type: orquesta
+description: Create VPC with boto3action using assume_role
 enabled: false
-entry_point: "workflows/create_vpc_assume_role.yaml"
+entry_point: workflows/create_vpc_assume_role.yaml
 parameters:
   cidr_block:
-    type: "string"
-    description: "VPC CIDR block"
+    type: string
+    description: VPC CIDR block
     required: true
   region:
-    type: "string"
-    description: "Region to create VPC"
+    type: string
+    description: Region to create VPC
     required: true
   subnet_cidr_block:
-    type: "string"
-    description: "Subnet CIDR block"
+    type: string
+    description: Subnet CIDR block
     required: true
   availability_zone:
-    type: "string"
-    description: "Availability zone to create subnet"
+    type: string
+    description: Availability zone to create subnet
     required: true
   role_arn:
-    type: "string"
-    description: "ARN of the role"
+    type: string
+    description: ARN of the role
     required: true
   aws_access_key_id:
-    type: "string"
-    description: "AWS Access Key"
+    type: string
+    description: AWS Access Key
     secret: true
   aws_secret_access_key:
-    type: "string"
-    description: "AWS Secret Access Key"
+    type: string
+    description: AWS Secret Access Key
     secret: true
   use_mfa:
-    type: "boolean"
-    description: "Include MFA details."
-    default: False
+    type: boolean
+    description: Include MFA details.
+    default: false
   serial_number:
-    type: "string"
-    description: "Serial number of the MFA"
+    type: string
+    description: Serial number of the MFA
   token_code:
-    type: "string"
-    description: "Token code from the MFA"
-...
+    type: string
+    description: Token code from the MFA

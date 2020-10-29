@@ -1,118 +1,120 @@
 ---
-version: '2.0'
-aws_boto3.create_vpc_assume_role:
-    type: direct
-    description: "Create VPC with boto3action"
+version: '1.0'
+description: Create VPC with boto3action
+input:
+  - cidr_block
+  - region
+  - subnet_cidr_block
+  - availability_zone
+  - role_arn
+  - aws_access_key_id
+  - aws_secret_access_key
+  - use_mfa
+  - serial_number
+  - token_code
+tasks:
+  assume_role:
+    action: aws_boto3.assume_role
     input:
-        - cidr_block
-        - region
-        - subnet_cidr_block
-        - availability_zone
-        - role_arn
-        - aws_access_key_id
-        - aws_secret_access_key
-        - use_mfa
-        - serial_number
-        - token_code
-    tasks:
-      assume_role:
-        action: aws_boto3.assume_role
-        input:
-          role_arn: <% $.role_arn %>
-          aws_access_key_id: <% $.aws_access_key_id %>
-          aws_secret_access_key: <% $.aws_secret_access_key %>
-          use_mfa: <% $.use_mfa %>
-          serial_number: <% $.serial_number %>
-          token_code: <% $.token_code %>
-
+      role_arn: <% ctx().role_arn %>
+      aws_access_key_id: <% ctx().aws_access_key_id %>
+      aws_secret_access_key: <% ctx().aws_secret_access_key %>
+      use_mfa: <% ctx().use_mfa %>
+      serial_number: <% ctx().serial_number %>
+      token_code: <% ctx().token_code %>
+    next:
+      - when: '{{ succeeded() }}'
         publish:
-          credentials: <% task().result.result['Credentials'] %>
-          assumed_role_user: <% task().result.result['AssumedRoleUser'] %>
-
-        on-success:
+          - credentials: <% task().result.result['Credentials'] %>
+          - assumed_role_user: <% task().result.result['AssumedRoleUser'] %>
+        do:
           - create_vpc
-
-      create_vpc:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_vpc
-          region: <% $.region %>
-          params: <% dict(CidrBlock => $.cidr_block, InstanceTenancy => "default") %>
-          credentials: <% $.credentials %>
+  create_vpc:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: create_vpc
+      region: <% ctx().region %>
+      params: <% dict(CidrBlock => ctx().cidr_block, InstanceTenancy => "default") %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
         publish:
-          vpc_id: <% task().result.result.Vpc.VpcId %>
-        on-success:
+          - vpc_id: <% task().result.result.Vpc.VpcId %>
+        do:
           - create_subnet
           - create_igw
-
-      create_subnet:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_subnet
-          region: <% $.region %>
-          params: <% dict(AvailabilityZone => $.availability_zone, CidrBlock => $.subnet_cidr_block, VpcId => $.vpc_id) %>
-          credentials: <% $.credentials %>
+  create_subnet:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: create_subnet
+      region: <% ctx().region %>
+      params: <% dict(AvailabilityZone => ctx().availability_zone, CidrBlock => ctx().subnet_cidr_block, VpcId => ctx().vpc_id) %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
         publish:
-          subnet_id: <% task().result.result.Subnet.SubnetId %>
-        on-success:
+          - subnet_id: <% task().result.result.Subnet.SubnetId %>
+        do:
           - create_route_table
-
-      create_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_internet_gateway
-          region: <% $.region %>
-          credentials: <% $.credentials %>
+  create_igw:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: create_internet_gateway
+      region: <% ctx().region %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
         publish:
-          igw_id: <% task().result.result.InternetGateway.InternetGatewayId %>
-        on-success:
+          - igw_id: <% task().result.result.InternetGateway.InternetGatewayId %>
+        do:
           - attach_igw
-
-      attach_igw:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: attach_internet_gateway
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id, InternetGatewayId => $.igw_id) %>
-          credentials: <% $.credentials %>
-        on-success:
+  attach_igw:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: attach_internet_gateway
+      region: <% ctx().region %>
+      params: <% dict(VpcId => ctx().vpc_id, InternetGatewayId => ctx().igw_id) %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
+        do:
           - create_route_igw
-
-      create_route_table:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route_table
-          region: <% $.region %>
-          params: <% dict(VpcId => $.vpc_id) %>
-          credentials: <% $.credentials %>
+  create_route_table:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: create_route_table
+      region: <% ctx().region %>
+      params: <% dict(VpcId => ctx().vpc_id) %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
         publish:
-          route_table_id: <% task().result.result.RouteTable.RouteTableId %>
-        on-success:
+          - route_table_id: <% task().result.result.RouteTable.RouteTableId %>
+        do:
           - attach_route_tables
-
-      attach_route_tables:
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: associate_route_table
-          region: <% $.region %>
-          params: <% dict(SubnetId => $.subnet_id, RouteTableId => $.route_table_id) %>
-          credentials: <% $.credentials %>
-        on-success:
+  attach_route_tables:
+    action: aws_boto3.boto3action
+    input:
+      service: ec2
+      action_name: associate_route_table
+      region: <% ctx().region %>
+      params: <% dict(SubnetId => ctx().subnet_id, RouteTableId => ctx().route_table_id) %>
+      credentials: <% ctx().credentials %>
+    next:
+      - when: '{{ succeeded() }}'
+        do:
           - create_route_igw
-
-      create_route_igw:
-        join: 2
-        action: aws_boto3.boto3action
-        input:
-          service: ec2
-          action_name: create_route
-          region: <% $.region %>
-          params: <% dict(RouteTableId => $.route_table_id, GatewayId => $.igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
-          credentials: <% $.credentials %>
-...
+  create_route_igw:
+    action: aws_boto3.boto3action
+    join: 2
+    input:
+      service: ec2
+      action_name: create_route
+      region: <% ctx().region %>
+      params: <% dict(RouteTableId => ctx().route_table_id, GatewayId => ctx().igw_id, DestinationCidrBlock => '0.0.0.0/0') %>
+      credentials: <% ctx().credentials %>

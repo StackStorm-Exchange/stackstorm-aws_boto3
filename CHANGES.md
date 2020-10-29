@@ -1,4 +1,6 @@
 ## Change Log
+## v0.8.0
+- Convert mistral workflows to orquesta
 
 ## v0.7.4
 

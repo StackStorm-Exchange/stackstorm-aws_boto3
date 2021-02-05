@@ -1,4 +1,9 @@
 ## Change Log
+
+## 1.0.0
+
+* Drop Python 2.7 support
+
 ## v0.8.0
 - Convert mistral workflows to orquesta
 

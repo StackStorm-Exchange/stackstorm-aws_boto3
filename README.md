@@ -48,7 +48,7 @@ MFA parameters.
 Then go ahead and install aws pack and then `aws_boto3.boto3action` is ready to use, without additional configurations.
 
 ```
-st2 run aws.boto3action service="ec2" action_name="describe_vpcs" region="us-west-1"
+st2 run aws_boto3.boto3action service="ec2" action_name="describe_vpcs" region="us-west-1"
 ```
 
 Let’s assume there is a boto3 profile name `production`. Use it like this:

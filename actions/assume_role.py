@@ -13,7 +13,8 @@ class Boto3AssumeRoleRunner(Action):
     def run(self, role_arn,
             policy=None, duration=3600, external_id=None,
             aws_access_key_id=None, aws_secret_access_key=None,
-            use_mfa=False, serial_number=None, token_code=None):
+            use_mfa=False, serial_number=None, token_code=None,
+            use_session_token=False, aws_session_token=None):
 
         success = False
         result = dict()
@@ -23,6 +24,9 @@ class Boto3AssumeRoleRunner(Action):
         if aws_access_key_id and aws_secret_access_key:
             sts_kwargs['aws_access_key_id'] = aws_access_key_id
             sts_kwargs['aws_secret_access_key'] = aws_secret_access_key
+        
+        if aws_session_token:
+            sts_kwargs['aws_session_token'] = aws_session_token
 
         client = boto3.client('sts', **sts_kwargs)
 

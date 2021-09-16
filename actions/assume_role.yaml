@@ -39,3 +39,9 @@ parameters:
     type: "string"
     description: "Token code from the MFA"
     secret: true
+  use_session_token:
+    type: "boolean"
+    description: "Include session token"
+  aws_session_token:
+    type: "string"
+    description: "Session token"

@@ -25,7 +25,7 @@ class Boto3AssumeRoleRunner(Action):
             sts_kwargs['aws_access_key_id'] = aws_access_key_id
             sts_kwargs['aws_secret_access_key'] = aws_secret_access_key
         
-        if aws_session_token:
+        if use_session_token:
             sts_kwargs['aws_session_token'] = aws_session_token
 
         client = boto3.client('sts', **sts_kwargs)

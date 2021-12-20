@@ -1,5 +1,8 @@
 ## Change Log
 
+## 1.0.1
+- Add support for AWS session token to `assume_role` action
+
 ## 1.0.0
 
 * Drop Python 2.7 support
